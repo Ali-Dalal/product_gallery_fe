@@ -1,0 +1,57 @@
+version: "2"
+services:
+  product_gallery_fe:
+    build: .
+    command: npm run serve
+    container_name: product-gallery-fe-container
+    image: product_gallery_fe_image
+    ports:
+      - "3001:3001"
+    depends_on:
+      - product_gallery_web_api
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      PRODUCT_GALLERY_WEB_API_HOST: http://product-gallery-web-api-container:3000
+  db:
+    image: "postgres:12-alpine"
+    container_name: database
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_DB: product_gallery_development
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+  migrations:
+    image: "allloush92/product_gellary_web:latest"
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      DEV_DB_CLIENT: pg
+      DEV_DB_HOST: database
+      DEV_DB_NAME: product_gallery_development
+      DEV_DB_USER: user
+      DEV_DB_PASSWORD: password
+      DEV_DB_MIN_POOL: 5
+      DEV_DP_MAX_POOL: 100
+    command: /bin/sh -c "npm i && npm i -g knex && knex migrate:latest --cwd ./src && knex seed:run --cwd ./src"
+    depends_on:
+      - db
+  product_gallery_web_api:
+    image: "allloush92/product_gellary_web:latest"
+    container_name: product-gallery-web-api-container
+    environment:
+      PORT: 3000
+      NODE_ENV: development
+      DEV_DB_CLIENT: pg
+      DEV_DB_HOST: database
+      DEV_DB_NAME: product_gallery_development
+      DEV_DB_USER: user
+      DEV_DB_PASSWORD: password
+      DEV_DB_MIN_POOL: 5
+      DEV_DP_MAX_POOL: 100
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - migrations
