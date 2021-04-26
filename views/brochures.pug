@@ -1,0 +1,28 @@
+extends layout
+
+block content
+    .container
+        .row
+            .col-md-12
+                .card(style='width: 100%')
+                    .card-body
+                        h5.card-title #{city.name}
+                        p.card-text
+                            | #{city.description}
+        .row
+            .col-md-12
+                .card(style='width: 100%')
+                    .card-body
+                        h5.card-title #{product.name}
+                        p.card-text
+                            | #{product.description}
+                    img.card-img-bottom(src=product.img_url alt=product.name)
+        .row
+            each brochure in product.brochures
+                .col-md-4
+                    .card(style='width: 100%; margin: 5;')
+                        .card-body
+                            h5.card-title #{brochure.name}
+                            p.card-text #{brochure.description}
+                            a.btn.btn-primary(href=brochure.brochure_url, target='_blank') Read Brochure
+
